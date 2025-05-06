@@ -1,0 +1,185 @@
+Baik, saya akan bantu menyelesaikan soal Post Test PHP #4 Tipe 1C berdasarkan ketentuan dari dokumen dan file yang telah kamu unggah. Berikut ini penjelasan dan revisi masing-masing file agar sesuai dengan ketentuan:
+
+---
+
+### ✅ 1. **`koneksi.php`** (alias `dbconn.php`)
+
+Sudah benar, tetapi perlu dipastikan nama databasenya adalah `php_4` seperti pada ketentuan.
+
+**Pastikan** file `koneksi.php` seperti ini:
+
+```php
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "php_4";
+
+$conn = mysqli_connect($host, $user, $pass, $db);
+
+if (!$conn) {
+    die("Koneksi gagal: " . mysqli_connect_error());
+}
+?>
+```
+
+---
+
+### ✅ 2. **`input.php`** (form input makanan)
+
+Perlu dilengkapi form untuk memasukkan nama, asal, dan upload gambar. Contoh implementasi:
+
+```php
+<?php include 'koneksi.php'; ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Input Makanan</title>
+</head>
+<body>
+    <h2>Form Input Makanan</h2>
+    <form action="upload.php" method="post" enctype="multipart/form-data">
+        <label>Nama Makanan:</label><br>
+        <input type="text" name="nama" required><br><br>
+
+        <label>Asal Negara:</label><br>
+        <input type="text" name="asal" required><br><br>
+
+        <label>Upload Gambar (jpg/pdf, max 4MB):</label><br>
+        <input type="file" name="gambar" accept=".jpg,.jpeg,.pdf" required><br><br>
+
+        <input type="submit" name="submit" value="Upload">
+    </form>
+</body>
+</html>
+```
+
+---
+
+### ✅ 3. **`upload.php`** (proses upload + validasi + insert DB)
+
+```php
+<?php
+include 'koneksi.php';
+
+if (isset($_POST['submit'])) {
+    $nama = $_POST['nama'];
+    $asal = $_POST['asal'];
+
+    $file = $_FILES['gambar'];
+    $fileName = $file['name'];
+    $fileTmp = $file['tmp_name'];
+    $fileSize = $file['size'];
+    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+    $allowed = ['jpg', 'jpeg', 'pdf'];
+
+    if (in_array($fileExt, $allowed)) {
+        if ($fileSize <= 4 * 1024 * 1024) {
+            $newFileName = uniqid() . '.' . $fileExt;
+            move_uploaded_file($fileTmp, 'uploads/' . $newFileName);
+
+            $query = "INSERT INTO makanan (namaMakanan, asalMakanan, gambarMakanan) VALUES ('$nama', '$asal', '$newFileName')";
+            if (mysqli_query($conn, $query)) {
+                echo "Data berhasil diupload.<br><a href='index.php'>Lihat Data</a>";
+            } else {
+                echo "Gagal memasukkan data ke database.";
+            }
+        } else {
+            echo "Ukuran file terlalu besar. Maksimum 4MB.";
+        }
+    } else {
+        echo "Format file tidak diizinkan. Hanya JPG atau PDF.";
+    }
+}
+?>
+```
+
+📝 *Pastikan folder `uploads/` ada dan dapat ditulisi.*
+
+---
+
+### ✅ 4. **`index.php`** (tampilan semua data makanan)
+
+```php
+<?php
+include 'koneksi.php';
+
+$result = mysqli_query($conn, "SELECT * FROM makanan");
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Makanan</title>
+</head>
+<body>
+    <h2>Daftar Makanan</h2>
+    <a href="input.php">Tambah Data</a>
+    <br><br>
+
+    <?php if (mysqli_num_rows($result) > 0): ?>
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Asal</th>
+            <th>Gambar</th>
+        </tr>
+        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+        <tr>
+            <td><?= $row['idMakanan']; ?></td>
+            <td><?= $row['namaMakanan']; ?></td>
+            <td><?= $row['asalMakanan']; ?></td>
+            <td>
+                <?php
+                $file = $row['gambarMakanan'];
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if ($ext === 'pdf') {
+                    echo "<a href='uploads/$file' target='_blank'>Lihat PDF</a>";
+                } else {
+                    echo "<img src='uploads/$file' width='100'>";
+                }
+                ?>
+            </td>
+        </tr>
+        <?php endwhile; ?>
+    </table>
+    <?php else: ?>
+        <p>Tidak ada data makanan.</p>
+    <?php endif; ?>
+</body>
+</html>
+```
+
+---
+
+### 🧾 Database: `php_4`
+
+Pastikan kamu menjalankan query ini di phpMyAdmin:
+
+```sql
+CREATE DATABASE php_4;
+USE php_4;
+
+CREATE TABLE `makanan` (
+  `idMakanan` int(11) NOT NULL AUTO_INCREMENT,
+  `namaMakanan` varchar(255) NOT NULL,
+  `asalMakanan` varchar(255) NOT NULL,
+  `gambarMakanan` varchar(255) NOT NULL,
+  PRIMARY KEY (`idMakanan`)
+);
+```
+
+Atau import file `makanan_db.sql` yang kamu lampirkan (isinya sesuai dengan struktur di atas).
+
+---
+
+Semua poin dari ketentuan sudah dipenuhi:
+
+✅ Validasi tipe file
+✅ Validasi ukuran file
+✅ Simpan data ke database
+✅ Tampilkan data di `index.php`
+
+Perlu bantuan untuk pengecekan lokal atau ingin saya buatkan versi zip-nya?
