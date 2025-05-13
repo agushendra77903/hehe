@@ -1,0 +1,57 @@
+<script>
+  const hari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+  var statusHari = ["?", "?", "?", "?", "?"];
+  let namaUser = null;
+  let indeksHari = 0;
+
+  function presensi() {
+    // Tanya nama hanya sekali
+    if (namaUser === null) {
+      namaUser = prompt("Masukkan nama Anda:");
+      if (!namaUser) {
+        alert("Nama tidak boleh kosong!");
+        namaUser = null;
+        return;
+      }
+      alert(`Halo ${namaUser}, silakan lanjutkan presensi`);
+      return;
+    }
+
+    // Jika semua hari sudah dipresensi
+    if (indeksHari >= hari.length) {
+      alert("Presensi minggu ini sudah lengkap!");
+      return;
+    }
+
+    // Tampilkan hari dan tanya status
+    const namaHari = hari[indeksHari];
+    const status = prompt(`${namaUser}, Masukkan status presensi hari ${namaHari} (H = Hadir, S = Sakit, I = Izin):`);
+
+    if (!["H", "S", "I"].includes(status)) {
+      alert("Input tidak valid. Masukkan hanya H, S, atau I.");
+      return;
+    }
+
+    // Konfirmasi
+    const konfirmasi = confirm(`Konfirmasi presensi ${namaUser} untuk hari ${namaHari}: ${status}`);
+    if (!konfirmasi) return;
+
+    // Simpan status
+    statusHari[indeksHari] = status;
+    indeksHari++;
+
+    // Tampilkan daftar status
+    let daftar = "Status kehadiran:\n";
+    for (let i = 0; i < hari.length; i++) {
+      daftar += `${hari[i]}: ${statusHari[i]}\n`;
+    }
+    document.getElementById("daftarstatus").innerText = daftar;
+
+    // Hitung jumlah H, S, I
+    const jumlahH = statusHari.filter(s => s === "H").length;
+    const jumlahS = statusHari.filter(s => s === "S").length;
+    const jumlahI = statusHari.filter(s => s === "I").length;
+
+    document.getElementById("laporan").innerText = `Total - Hadir: ${jumlahH}, Sakit: ${jumlahS}, Izin: ${jumlahI}`;
+  }
+</script>
