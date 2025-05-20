@@ -1,0 +1,65 @@
+cinema.js
+
+const movieAction = ['Avengers', 'John Wick 4', 'Gladiator'];
+const movieDrama = ['The Covenant', 'Dune: Part Two', 'The Bikeriders'];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const genreSelect = document.getElementById('genre');
+  const movieSelect = document.getElementById('movie');
+  const errorMessage = document.getElementById('error-message');
+  const form = document.getElementById('cinemaForm');
+
+  genreSelect.addEventListener('change', () => {
+    const selectedGenre = genreSelect.value;
+
+    // Kosongkan movie list dan error
+    movieSelect.innerHTML = '<option value="">Select</option>';
+    errorMessage.textContent = '';
+
+    if (selectedGenre === 'Action') {
+      movieAction.forEach(movie => {
+        const option = document.createElement('option');
+        option.value = movie;
+        option.textContent = movie;
+        movieSelect.appendChild(option);
+      });
+    } else if (selectedGenre === 'Drama') {
+      movieDrama.forEach(movie => {
+        const option = document.createElement('option');
+        option.value = movie;
+        option.textContent = movie;
+        movieSelect.appendChild(option);
+      });
+    } else if (selectedGenre === 'Comedy') {
+      errorMessage.textContent = 'Maaf, Belum ada film untuk genre ini';
+    }
+  });
+
+  window.makeRegistration = function () {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const date = document.getElementById('date').value;
+    const genre = document.getElementById('genre').value;
+    const movie = document.getElementById('movie').value;
+
+    if (!name || !email || !date || !genre || (!movie && genre !== 'Comedy')) {
+      alert('Harap lengkapi semua data terlebih dahulu!');
+      return;
+    }
+
+    // Tampilkan dialog
+    let message = `--- Data Reservasi ---\n`;
+    message += `Nama: ${name}\n`;
+    message += `Email: ${email}\n`;
+    message += `Tanggal: ${date}\n`;
+    message += `Genre: ${genre}\n`;
+    message += genre === 'Comedy' ? `Film: (Belum tersedia)\n` : `Film: ${movie}\n`;
+
+    alert(message);
+
+    // Reset form
+    form.reset();
+    movieSelect.innerHTML = '<option value="">Select</option>';
+    errorMessage.textContent = '';
+  };
+});
